@@ -228,8 +228,6 @@ view(trip_data_clean_2021 %>% group_by(member_casual) %>% filter(start_date == e
 view(trip_data_clean_2021 %>% group_by(member_casual) %>% filter(start_date != end_date & trip_length > 0) %>% summarise(max(trip_length), mean(trip_length), median(trip_length), min(trip_length), max(trip_displacement), mean(trip_displacement), median(trip_displacement), min(trip_displacement)))
 ```
 
-#
-
 ```{r}
 view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
