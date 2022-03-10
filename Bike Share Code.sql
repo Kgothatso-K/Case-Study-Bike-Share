@@ -209,9 +209,9 @@ With temp_table AS
 )
 SELECT *
 FROM temp_table 
-WHERE ride_id is not null OR rideable_type is not null OR start_date is not null OR start_month is not null OR 	
-    start_day is not null OR end_date is not null OR end_month is not null OR end_day is not null OR trip_length is not null OR 	
-    trip_displacement is not null OR member_casual is not null;
+WHERE ride_id is not null AND rideable_type is not null AND start_date is not null AND start_month is not null AND 	
+    start_day is not null AND end_date is not null AND end_month is not null AND end_day is not null AND trip_length is not null AND 	
+    trip_displacement is not null AND member_casual is not null;
 
 -- Save the new table
 
