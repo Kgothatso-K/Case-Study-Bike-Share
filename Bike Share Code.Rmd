@@ -16,7 +16,6 @@ install.packages("janitor")
 install.packages("dplyr")
 install.packages("ggplot2")
 install.packages("lubridate")
-install.packages("scales")
 ```
 
 ```{r}
@@ -26,7 +25,6 @@ library(janitor)
 library(dplyr)
 library(ggplot2)
 library(lubridate)
-library(scales)
 ```
 
 # Import data
