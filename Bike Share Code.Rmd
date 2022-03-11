@@ -105,14 +105,20 @@ str(trip_data_dirty_2021)
 trip_data_dirty_2021$start_date <- as.Date(trip_data_dirty_2021$started_at)
 trip_data_dirty_2021$end_date <- as.Date(trip_data_dirty_2021$ended_at)
 trip_data_dirty_2021$trip_length <- difftime(trip_data_dirty_2021$ended_at, trip_data_dirty_2021$started_at)
-trip_data_dirty_2021$start_day <- wday(as.Date(trip_data_dirty_2021$started_at), label = TRUE)
-trip_data_dirty_2021$end_day <- wday(as.Date(trip_data_dirty_2021$ended_at), label = TRUE)
-trip_data_dirty_2021$start_month <- month(as.Date(trip_data_dirty_2021$started_at), label = TRUE)
-trip_data_dirty_2021$end_month <- month(as.Date(trip_data_dirty_2021$ended_at), label = TRUE)
+trip_data_dirty_2021$start_time <- format(trip_data_dirty_2021$started_at, "%H:%M:%S")
+trip_data_dirty_2021$end_time <- format(trip_data_dirty_2021$ended_at, "%H:%M:%S")
+trip_data_dirty_2021$start_day_string <- wday(trip_data_dirty_2021$started_at, label = TRUE)
+trip_data_dirty_2021$start_day_int <- wday(trip_data_dirty_2021$started_at)
+trip_data_dirty_2021$end_day_string <- wday(trip_data_dirty_2021$ended_at, label = TRUE)
+trip_data_dirty_2021$end_day_int <- wday(trip_data_dirty_2021$ended_at)
+trip_data_dirty_2021$start_month_string <- month(trip_data_dirty_2021$started_at, label = TRUE)
+trip_data_dirty_2021$start_month_int <- month(trip_data_dirty_2021$started_at)
+trip_data_dirty_2021$end_month_string <- month(trip_data_dirty_2021$ended_at, label = TRUE)
+trip_data_dirty_2021$end_month_int <- month(trip_data_dirty_2021$ended_at)
 ```
 
 ```{r}
-trip_data_clean_2021 <- trip_data_dirty_2021 %>% select(ride_id, rideable_type, start_date, start_month, start_day, end_date, end_month, end_day, start_lat, start_lng, end_lat, end_lng, trip_length, member_casual)
+trip_data_clean_2021 <- trip_data_dirty_2021 %>% select(ride_id, rideable_type, start_date, start_month_string, start_month_int, start_day_string, start_day_int, start_time, end_date, end_month_string, end_month_int, end_day_string, end_day_int, start_lat, start_lng, end_lat, end_lng, trip_length, member_casual)
 ```
 
 ```{r}
@@ -128,7 +134,7 @@ At this point of the project, a clean csv file was uploaded. The data was furthe
 The differences between the trip_data_clean_2021_R file in R and  the trip_data_clean_2021_SQL file in SQl are;
 1. The SQL file has the column, trip_displacement,
 2. Rows containing empty spaces were removed,
-3. The coordinates in trip_data_clean_2021_R were used to calculate the displacement.
+3. The coordinates in trip_data_clean_2021_R were used to calculate the displacement between the stations.
 
 ```{r}
 trip_data_clean_2021 <- read_csv("trip_data_clean_2021_SQL.csv")
@@ -221,11 +227,19 @@ view(trip_data_clean_2021 %>% group_by(member_casual, end_date) %>% filter(membe
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual) %>% filter(start_date == end_date & trip_length > 0) %>% summarise(max(trip_length), mean(trip_length), median(trip_length), min(trip_length), max(trip_displacement), mean(trip_displacement), median(trip_displacement), min(trip_displacement)))
+view(trip_data_clean_2021 %>% group_by(member_casual, start_hour = hour(start_time)) %>% summarise(number_rides = length(ride_id)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual) %>% filter(start_date != end_date & trip_length > 0) %>% summarise(max(trip_length), mean(trip_length), median(trip_length), min(trip_length), max(trip_displacement), mean(trip_displacement), median(trip_displacement), min(trip_displacement)))
+view(trip_data_clean_2021 %>% group_by(member_casual, end_hour = hour(end_time)) %>% summarise(number_rides = length(ride_id)))
+```
+
+```{r}
+view(trip_data_clean_2021 %>% group_by(member_casual) %>% filter(start_date == end_date) %>% summarise(max(trip_length), mean(trip_length), median(trip_length), min(trip_length), max(trip_displacement), mean(trip_displacement), median(trip_displacement), min(trip_displacement)))
+```
+
+```{r}
+view(trip_data_clean_2021 %>% group_by(member_casual) %>% filter(start_date != end_date) %>% summarise(max(trip_length), mean(trip_length), median(trip_length), min(trip_length), max(trip_displacement), mean(trip_displacement), median(trip_displacement), min(trip_displacement)))
 ```
 
 ```{r}
@@ -305,6 +319,14 @@ view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_date) %
 ```
 
 ```{r}
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_hour = hour(start_time)) %>% summarise(number_rides = length(ride_id)))
+```
+
+```{r}
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_hour = hour(end_time)) %>% summarise(number_rides = length(ride_id)))
+```
+
+```{r}
 view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type) %>% filter(start_date == end_date & trip_length > 0) %>% summarise(max(trip_length), mean(trip_length), median(trip_length), min(trip_length), max(trip_displacement), mean(trip_displacement), median(trip_displacement), min(trip_displacement)))
 ```
 
@@ -315,9 +337,9 @@ view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type) %>% filter(
 # Visualise the data
 
 ```{r}
-trip_data_clean_2021 %>% group_by(member_casual, rideable_type) %>% summarise(number_rides = length(ride_id)) %>%
-
-ggplot(aes(x = reorder(member_casual, -number_rides), y = number_rides, fill = rideable_type)) + geom_bar(stat = "identity", position = position_dodge()) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), position = position_dodge(0.9), vjust = -0.3, size = 3.5) + labs(title = "Number Of Rides Per Member", x = "Type Of Member", y = "Number Of Rides", fill = "Ride Type") 
+trip_data_clean_2021 %>% group_by(member_casual, rideable_type) %>% summarise(number_rides = length(ride_id)) %>% 
+ 
+ggplot(aes(x = reorder(member_casual, member_casual), y = number_rides, fill = rideable_type)) + geom_bar(stat = "identity", position = position_dodge()) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), position = position_dodge(0.9), vjust = -0.3, size = 3.5) + labs(title = "Number Of Rides Per Member", x = "Type Of Member", y = "Number Of Rides", fill = "Ride Type") 
 
 ggsave('Rides Per Member.png',
        width=16,
@@ -325,9 +347,9 @@ ggsave('Rides Per Member.png',
 ```
 
 ```{r}
-trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_day) %>% summarise(number_rides = length(ride_id)) %>%
+trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_day_string, start_day_int) %>% summarise(number_rides = length(ride_id)) %>%
   
-  ggplot(aes(x = reorder(start_day, number_rides), y = number_rides, group = rideable_type)) + geom_line(aes(color = rideable_type)) + geom_point(aes(color = rideable_type, shape = rideable_type)) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), size = 3.5) + labs(title = "Number Of Rides Per Start Day", x = "Start Day", y = "Number Of Rides", fill = "Ride Type")
+  ggplot(aes(x = reorder(start_day_string, start_day_int), y = number_rides, group = rideable_type)) + geom_line(aes(color = rideable_type)) + geom_point(aes(color = rideable_type, shape = rideable_type)) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), size = 3.5) + labs(title = "Number Of Rides Per Start Day", x = "Start Day", y = "Number Of Rides", fill = "Ride Type")
 
 ggsave('Rides Per Start Day.png',
        width=16,
@@ -335,9 +357,9 @@ ggsave('Rides Per Start Day.png',
 ```
 
 ```{r}
-trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_day) %>% summarise(number_rides = length(ride_id)) %>%
+trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_day_string, end_day_int) %>% summarise(number_rides = length(ride_id)) %>%
   
-  ggplot(aes(x = reorder(end_day, number_rides), y = number_rides, group = rideable_type)) + geom_line(aes(color = rideable_type)) + geom_point(aes(color = rideable_type, shape = rideable_type)) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), size = 3.5) + labs(title = "Number Of Rides Per End Day", x = "End Day", y = "Number Of Rides", fill = "Ride Type")
+  ggplot(aes(x = reorder(end_day_string, end_day_int), y = number_rides, group = rideable_type)) + geom_line(aes(color = rideable_type)) + geom_point(aes(color = rideable_type, shape = rideable_type)) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), size = 3.5) + labs(title = "Number Of Rides Per End Day", x = "End Day", y = "Number Of Rides", fill = "Ride Type")
 
 ggsave('Rides Per End Day.png',
        width=16,
@@ -345,9 +367,9 @@ ggsave('Rides Per End Day.png',
 ```
 
 ```{r}
-trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_month) %>% summarise(number_rides = length(ride_id)) %>%
+trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_month_string, start_month_int) %>% summarise(number_rides = length(ride_id)) %>%
   
-  ggplot(aes(x = reorder(start_month, number_rides), y = number_rides, fill = rideable_type)) + geom_bar(stat = "identity", position = position_dodge()) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), position = position_dodge(0.9), vjust = -0.3, size = 3.5) + labs(title = "Number Of Rides Per Start Month", x = "Start Month", y = "Number Of Rides", fill = "Ride Type")
+  ggplot(aes(x = reorder(start_month_string, start_month_int), y = number_rides, group = rideable_type)) + geom_line(aes(color = rideable_type)) + geom_point(aes(color = rideable_type, shape = rideable_type)) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), position = position_dodge(0.9), vjust = -0.3, size = 3.5) + labs(title = "Number Of Rides Per Start Month", x = "Start Month", y = "Number Of Rides", fill = "Ride Type")
 
 ggsave('Rides Per Start Month.png',
        width=16,
@@ -355,11 +377,31 @@ ggsave('Rides Per Start Month.png',
 ```
 
 ```{r}
-trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_month) %>% summarise(number_rides = length(ride_id)) %>%
+trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_month_string, end_month_int) %>% summarise(number_rides = length(ride_id)) %>%
   
-  ggplot(aes(x = reorder(end_month, number_rides), y = number_rides, fill = rideable_type)) + geom_bar(stat = "identity", position = position_dodge()) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), position = position_dodge(0.9), vjust = -0.3, size = 3.5) + labs(title = "Number Of Rides Per End Month", x = "End Month", y = "Number Of Rides", fill = "Ride Type")
+  ggplot(aes(x = reorder(end_month_string, end_month_int), y = number_rides, group = rideable_type)) + geom_line(aes(color = rideable_type)) + geom_point(aes(color = rideable_type, shape = rideable_type)) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + geom_text(aes(label = number_rides), position = position_dodge(0.9), vjust = -0.3, size = 3.5) + labs(title = "Number Of Rides Per End Month", x = "Start Month", y = "Number Of Rides", fill = "Ride Type")
 
 ggsave('Rides Per End Month.png',
+       width=16,
+       height=8)
+```
+
+```{r}
+trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_hour = hour(start_time)) %>% summarise(number_rides = length(ride_id), max_number_rides = max(length(ride_id))) %>%
+
+ ggplot(aes(x = reorder(start_hour, start_hour), y = number_rides, group = rideable_type)) + geom_line(aes(color = rideable_type)) + geom_point(aes(color = rideable_type, shape = rideable_type)) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + labs(title = "Number Of Rides Per Start Hour", x = "Start Hour", y = "Number Of Rides", fill = "Ride Type")
+
+ggsave('Rides Per Start Hour.png',
+       width=16,
+       height=8)
+```
+
+```{r}
+trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_hour = hour(end_time)) %>% summarise(number_rides = length(ride_id)) %>%
+
+ ggplot(aes(x = reorder(end_hour, end_hour), y = number_rides, group = rideable_type)) + geom_line(aes(color = rideable_type)) + geom_point(aes(color = rideable_type, shape = rideable_type)) + facet_wrap(~ member_casual) + theme_minimal() + scale_fill_brewer(palette = "Dark2") + labs(title = "Number Of Rides Per End Hour", x = "End Hour", y = "Number Of Rides", fill = "Ride Type")
+
+ggsave('Rides Per End Hour.png',
        width=16,
        height=8)
 ```
