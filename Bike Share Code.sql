@@ -121,6 +121,7 @@ USING (ride_id, rideable_type, started_at, ended_at, start_station_name, start_s
     end_station_id, start_lat, start_lng, end_lat, end_lng, member_casual);
 
 -- Save the results as a new table
+
 /*
 Case Study - Bike Share
 
@@ -153,12 +154,14 @@ FROM `my-project-test-336015.bike_share.Trip_Data_Dirty_2021`;
 
 -- Identify the days for which trips occur
 
-SELECT ended_at, format_datetime("%a", ended_at) AS end_day, started_at, format_datetime("%a", started_at) AS start_day
+SELECT ended_at, format_datetime("%a", ended_at) AS end_day_string, extract(dayofweek FROM ended_at) AS end_day_int, 
+    started_at, format_datetime("%a", started_at) AS start_day_string, extract(dayofweek FROM started_at) AS start_day_int
 FROM `my-project-test-336015.bike_share.Trip_Data_Dirty_2021`;
 
 -- Identify the months for which trips occur
 
-SELECT started_at, format_datetime("%b", started_at) AS start_month, ended_at, format_datetime("%b", ended_at) AS end_month
+SELECT started_at, format_datetime("%b", started_at) AS start_month_string, extract(month FROM started_at) AS start_month_int,
+    ended_at, format_datetime("%b", ended_at) AS end_month_string, extract(month FROM ended_at) AS end_month_int
 FROM `my-project-test-336015.bike_share.Trip_Data_Dirty_2021`;
 
 -- Combine coordinates
@@ -181,37 +184,63 @@ FROM `my-project-test-336015.bike_share.Trip_Data_Dirty_2021`;
 
 With temp_table AS 
 (
-    SELECT ride_id, rideable_type, extract(date FROM started_at) AS start_date, 
-        format_datetime("%b", started_at) AS start_month, format_datetime("%a", started_at) AS start_day, 
-        extract(date FROM ended_at) AS end_date, format_datetime("%b", ended_at) AS end_month, 
-        format_datetime("%a", ended_at) AS end_day, DATE_DIFF(ended_at, started_at, Second) AS trip_length, 
+    SELECT ride_id, rideable_type, 
+    
+        extract(date FROM started_at) AS start_date, format_datetime("%b", started_at) AS start_month_string, 
+        extract(month FROM started_at) AS start_month_int, format_datetime("%a", started_at) AS start_day_string, 
+        extract(dayofweek FROM started_at) AS start_day_int, extract(time FROM started_at) AS start_time, 
+        
+        extract(date FROM ended_at) AS end_date, format_datetime("%b", ended_at) AS end_month_string, 
+        extract(month FROM ended_at) AS end_month_int, format_datetime("%a", ended_at) AS end_day_string, 
+        extract(dayofweek FROM ended_at) AS end_day_int, extract(time FROM ended_at) AS end_time,
+
+        DATE_DIFF(ended_at, started_at, Second) AS trip_length, 
         (ST_DISTANCE(ST_GEOGPOINT(start_lng, start_lat), ST_GEOGPOINT(end_lng, end_lat))) AS trip_displacement, 
         member_casual
     FROM `my-project-test-336015.bike_share.Trip_Data_Dirty_2021`
 )
 SELECT *
 FROM temp_table 
-WHERE ride_id is null OR rideable_type is null OR	start_date is null OR start_month is null OR 	
-    start_day is null OR end_date is null OR end_month is null OR end_day is null OR trip_length is null OR 	
-    trip_displacement is null OR member_casual is null;
+WHERE ride_id is null OR rideable_type is null OR 
+    
+    start_date is null OR start_month_string is null OR start_month_int is null OR start_day_string is null OR 	
+    start_day_int is null OR start_time is null OR 
+    
+    end_date is null OR end_month_string is null OR end_month_int is null OR end_day_string is null OR 	
+    end_day_int is null OR end_time is null OR 
+    
+    trip_length is null OR trip_displacement is null OR member_casual is null;
 
 -- Create new table with cleaned data
 
 With temp_table AS 
 (
-    SELECT ride_id, rideable_type, extract(date FROM started_at) AS start_date, 
-        format_datetime("%b", started_at) AS start_month, format_datetime("%a", started_at) AS start_day, 
-        extract(date FROM ended_at) AS end_date, format_datetime("%b", ended_at) AS end_month, 
-        format_datetime("%a", ended_at) AS end_day, DATE_DIFF(ended_at, started_at, Second) AS trip_length, 
+    SELECT ride_id, rideable_type, 
+    
+        extract(date FROM started_at) AS start_date, format_datetime("%b", started_at) AS start_month_string, 
+        extract(month FROM started_at) AS start_month_int, format_datetime("%a", started_at) AS start_day_string, 
+        extract(dayofweek FROM started_at) AS start_day_int, extract(time FROM started_at) AS start_time, 
+        
+        extract(date FROM ended_at) AS end_date, format_datetime("%b", ended_at) AS end_month_string, 
+        extract(month FROM ended_at) AS end_month_int, format_datetime("%a", ended_at) AS end_day_string, 
+        extract(dayofweek FROM ended_at) AS end_day_int, extract(time FROM ended_at) AS end_time,
+
+        DATE_DIFF(ended_at, started_at, Second) AS trip_length, 
         (ST_DISTANCE(ST_GEOGPOINT(start_lng, start_lat), ST_GEOGPOINT(end_lng, end_lat))) AS trip_displacement, 
         member_casual
     FROM `my-project-test-336015.bike_share.Trip_Data_Dirty_2021`
 )
 SELECT *
 FROM temp_table 
-WHERE ride_id is not null AND rideable_type is not null AND start_date is not null AND start_month is not null AND 	
-    start_day is not null AND end_date is not null AND end_month is not null AND end_day is not null AND trip_length is not null AND 	
-    trip_displacement is not null AND member_casual is not null;
+WHERE ride_id is not null AND rideable_type is not null AND  
+    
+    start_date is not null AND start_month_string is not null AND start_month_int is not null AND start_day_string is not null AND
+    start_day_int is not null AND start_time is not null AND  
+    
+    end_date is not null AND end_month_string is not null AND end_month_int is not null AND end_day_string is not null AND 
+    end_day_int is not null AND end_time is not null AND 
+    
+    trip_length is not null AND trip_displacement is not null AND member_casual is not null;
 
 -- Save the new table
 
@@ -235,72 +264,72 @@ FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 GROUP BY member_casual
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, start_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, start_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
-GROUP BY member_casual, start_day
+GROUP BY member_casual, start_day_string
 ORDER BY Count_Riders DESC;
 
-SELECT member_casual, start_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, start_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "member"
-GROUP BY member_casual, start_day
+GROUP BY member_casual, start_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, start_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, start_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
-GROUP BY member_casual, start_day
+GROUP BY member_casual, start_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, end_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, end_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
-GROUP BY member_casual, end_day
+GROUP BY member_casual, end_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, end_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, end_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "member"
-GROUP BY member_casual, end_day
+GROUP BY member_casual, end_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, end_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, end_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
-GROUP BY member_casual, end_day
+GROUP BY member_casual, end_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, start_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, start_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
-GROUP BY member_casual, start_month
+GROUP BY member_casual, start_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, start_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, start_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "member"
-GROUP BY member_casual, start_month
+GROUP BY member_casual, start_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, start_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, start_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
-GROUP BY member_casual, start_month
+GROUP BY member_casual, start_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, end_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, end_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
-GROUP BY member_casual, end_month
+GROUP BY member_casual, end_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, end_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, end_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "member"
-GROUP BY member_casual, end_month
+GROUP BY member_casual, end_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, end_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, end_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
-GROUP BY member_casual, end_month
+GROUP BY member_casual, end_month_string
 ORDER BY Count_Riders DESC; 
 
 SELECT member_casual, start_date, count(ride_id) AS Count_Riders
@@ -335,6 +364,16 @@ SELECT member_casual, end_date, count(ride_id) AS Count_Riders
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
 GROUP BY member_casual, end_date
+ORDER BY Count_Riders DESC;
+
+SELECT member_casual, extract(hour FROM start_time) AS Start_Hour, count(ride_id) AS Count_Riders
+FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
+GROUP BY member_casual, Start_Hour
+ORDER BY Count_Riders DESC;
+
+SELECT member_casual, extract(hour FROM end_time) AS End_Hour, count(ride_id) AS Count_Riders
+FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
+GROUP BY member_casual, End_Hour
 ORDER BY Count_Riders DESC;
 
 SELECT member_casual, count(ride_id) AS Count_Riders, max(trip_length) AS Max_Trip_Length, 
@@ -358,72 +397,72 @@ FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 GROUP BY member_casual, rideable_type
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, start_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, start_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
-GROUP BY member_casual, rideable_type, start_day
+GROUP BY member_casual, rideable_type, start_day_string
 ORDER BY Count_Riders DESC;
 
-SELECT member_casual, rideable_type, start_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, start_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "member"
-GROUP BY member_casual, rideable_type, start_day
+GROUP BY member_casual, rideable_type, start_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, start_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, start_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
-GROUP BY member_casual, rideable_type, start_day
+GROUP BY member_casual, rideable_type, start_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, end_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, end_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
-GROUP BY member_casual, rideable_type, end_day
+GROUP BY member_casual, rideable_type, end_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, end_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, end_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "member"
-GROUP BY member_casual, rideable_type, end_day
+GROUP BY member_casual, rideable_type, end_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, end_day, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, end_day_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
-GROUP BY member_casual, rideable_type, end_day
+GROUP BY member_casual, rideable_type, end_day_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, start_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, start_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
-GROUP BY member_casual, rideable_type, start_month
+GROUP BY member_casual, rideable_type, start_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, start_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, start_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "member"
-GROUP BY member_casual, rideable_type, start_month
+GROUP BY member_casual, rideable_type, start_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, start_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, start_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
-GROUP BY member_casual, rideable_type, start_month
+GROUP BY member_casual, rideable_type, start_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, end_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, end_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
-GROUP BY member_casual, rideable_type, end_month
+GROUP BY member_casual, rideable_type, end_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, end_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, end_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "member"
-GROUP BY member_casual, rideable_type, end_month
+GROUP BY member_casual, rideable_type, end_month_string
 ORDER BY Count_Riders DESC; 
 
-SELECT member_casual, rideable_type, end_month, count(ride_id) AS Count_Riders,
+SELECT member_casual, rideable_type, end_month_string, count(ride_id) AS Count_Riders,
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
-GROUP BY member_casual, rideable_type, end_month
+GROUP BY member_casual, rideable_type, end_month_string
 ORDER BY Count_Riders DESC; 
 
 SELECT member_casual, rideable_type, start_date, count(ride_id) AS Count_Riders
@@ -458,6 +497,16 @@ SELECT member_casual, rideable_type, end_date, count(ride_id) AS Count_Riders
 FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
 WHERE member_casual = "casual"
 GROUP BY member_casual, rideable_type, end_date
+ORDER BY Count_Riders DESC;
+
+SELECT member_casual, rideable_type, extract(hour FROM start_time) AS Start_Hour, count(ride_id) AS Count_Riders
+FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
+GROUP BY member_casual, rideable_type, Start_Hour
+ORDER BY Count_Riders DESC;
+
+SELECT member_casual, rideable_type, extract(hour FROM end_time) AS End_Hour, count(ride_id) AS Count_Riders
+FROM `my-project-test-336015.bike_share.Trip_Data_Clean_2021`
+GROUP BY member_casual, rideable_type, End_Hour
 ORDER BY Count_Riders DESC;
 
 SELECT member_casual, rideable_type, count(ride_id) AS Count_Riders, max(trip_length) AS Max_Trip_Length, 
