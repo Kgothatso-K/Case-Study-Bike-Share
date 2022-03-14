@@ -155,51 +155,51 @@ view(trip_data_clean_2021 %>% group_by(member_casual) %>% summarise(number_rides
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, start_day) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, start_day_string) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, start_day) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, start_day_string) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, start_day) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, start_day_string) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, end_day) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, end_day_string) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, end_day) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, end_day_string) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, end_day) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, end_day_string) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, start_month) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, start_month_string) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, start_month) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, start_month_string) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, start_month) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, start_month_string) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, end_month) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, end_month_string) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, end_month) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, end_month_string) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, end_month) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, end_month_string) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
@@ -247,51 +247,51 @@ view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type) %>% summari
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_day) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_day_string) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_day) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_day_string) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_day) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_day_string) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_day) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_day_string) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_day) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_day_string) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_day) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_day_string) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_month) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_month_string) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_month) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_month_string) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_month) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, start_month_string) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_month) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_month_string) %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_month) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_month_string) %>% filter(member_casual == "member")  %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
-view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_month) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
+view(trip_data_clean_2021 %>% group_by(member_casual, rideable_type, end_month_string) %>% filter(member_casual == "casual") %>% summarise(number_rides = length(ride_id)) %>% arrange(desc(number_rides)))
 ```
 
 ```{r}
