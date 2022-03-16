@@ -1,6 +1,6 @@
 ---
-title: "Bike Share Project"
-author: "Kgothatso K"
+Title: "Bike Share Case Study"
+Author: "Kgothatso K"
 ---
 
 # Background
