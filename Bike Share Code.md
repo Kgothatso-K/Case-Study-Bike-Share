@@ -3,6 +3,10 @@ Title: "Bike Share Case Study"
 Author: "Kgothatso K"
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
 # Background
 
 This project is part of the Bike Share Case Study.
@@ -13,21 +17,19 @@ This project is part of the Bike Share Case Study.
 install.packages("tidyverse")
 install.packages("skimr")
 install.packages("janitor")
-install.packages("dplyr")
-install.packages("ggplot2")
 install.packages("lubridate")
 install.packages("plotly")
+install.packages("ggcorrplot")
 ```
 
 ```{r}
 library(tidyverse)
 library(skimr)
 library(janitor)
-library(dplyr)
-library(ggplot2)
 library(lubridate)
 library(plotly)
 library(htmlwidgets)
+library(ggcorrplot)
 ```
 
 # Import data
@@ -108,6 +110,7 @@ write.csv(trip_data_dirty_2021,"trip_data_dirty_2021_R.csv", row.names = FALSE)
 
 ```{r}
 length(trip_data_dirty_2021$ride_id)
+
 length(unique(trip_data_dirty_2021$ride_id))
 ```
 
@@ -145,6 +148,7 @@ trip_data_dirty_2021$end_month_int <- month(trip_data_dirty_2021$ended_at)
 
 ```{r}
 trip_data_clean_2021 <- trip_data_dirty_2021 %>% 
+  
   select(ride_id, 
          rideable_type, 
          start_date, 
@@ -187,6 +191,8 @@ trip_data_clean_2021 <- read_csv("trip_data_clean_2021_SQL.csv")
 
 ```{r}
 view(is.na(trip_data_clean_2021))
+
+view(colSums(is.na(trip_data_clean_2021)))
 ```
 
 ```{r}
@@ -199,165 +205,11 @@ str(trip_data_clean_2021)
 
 ```{r}
 view(trip_data_clean_2021 %>% 
+       
        group_by(member_casual) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_day_string) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_day_string) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_day_string) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_day_string) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_day_string) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_day_string) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_month_string) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_month_string) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_month_string) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_month_string) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_month_string) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_month_string) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_date) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_date) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_date) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_date) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_date) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_date) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, start_hour = hour(start_time)) %>% 
-       summarise(number_rides = length(ride_id)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, end_hour = hour(end_time)) %>% 
-       summarise(number_rides = length(ride_id)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual) %>% 
+       
        filter(start_date == end_date) %>% 
+       
        summarise(max(trip_length), 
                  mean(trip_length), 
                  median(trip_length), 
@@ -372,8 +224,11 @@ view(trip_data_clean_2021 %>%
 
 ```{r}
 view(trip_data_clean_2021 %>% 
+       
        group_by(member_casual) %>% 
+       
        filter(start_date != end_date) %>% 
+       
        summarise(max(trip_length), 
                  mean(trip_length), 
                  median(trip_length), 
@@ -388,165 +243,11 @@ view(trip_data_clean_2021 %>%
 
 ```{r}
 view(trip_data_clean_2021 %>% 
+       
        group_by(member_casual, rideable_type) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_day_string) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_day_string) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_day_string) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_day_string) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_day_string) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_day_string) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_month_string) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_month_string) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_month_string) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_month_string) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_month_string) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_month_string) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_date) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_date) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_date) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_date) %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_date) %>% 
-       filter(member_casual == "member")  %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_date) %>% 
-       filter(member_casual == "casual") %>% 
-       summarise(number_rides = length(ride_id)) %>% 
-       arrange(desc(number_rides)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, start_hour = hour(start_time)) %>% 
-       summarise(number_rides = length(ride_id)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type, end_hour = hour(end_time)) %>% 
-       summarise(number_rides = length(ride_id)))
-```
-
-```{r}
-view(trip_data_clean_2021 %>% 
-       group_by(member_casual, rideable_type) %>% 
+       
        filter(start_date == end_date & trip_length > 0) %>% 
+       
        summarise(max(trip_length), 
                  mean(trip_length), 
                  median(trip_length), 
@@ -561,8 +262,11 @@ view(trip_data_clean_2021 %>%
 
 ```{r}
 view(trip_data_clean_2021 %>% 
+       
        group_by(member_casual, rideable_type) %>% 
+       
        filter(start_date != end_date & trip_length > 0) %>% 
+       
        summarise(max(trip_length), 
                  mean(trip_length), 
                  median(trip_length), 
@@ -577,9 +281,35 @@ view(trip_data_clean_2021 %>%
 
 # Visualise the data
 
+## Correlation matrix
+
+```{r}
+corr_matrix <- dplyr::select_if(trip_data_clean_2021, is.numeric)
+
+view(correlation <- cor(corr_matrix, use = "complete.obs"))
+```
+
+```{r}
+plot_static = ggcorrplot(correlation, hc.order = TRUE, type = "lower")
+```
+
+```{r}
+plot_interact = ggplotly(plot_static)
+```
+
+```{r}
+saveWidget(plot_interact, "Correlation Matrix.html")
+```
+
+## Visualisations for number of rides
+
+### Bar plot for rides per member
+
 ```{r}
 trip_data_clean_2021 %>% 
+  
   group_by(member_casual, rideable_type) %>% 
+  
   summarise(number_rides = length(ride_id)) %>% 
   
   ggplot(aes(x = reorder(member_casual, member_casual), 
@@ -605,14 +335,18 @@ trip_data_clean_2021 %>%
          x = "Type Of Member", 
          y = "Number Of Rides")
 
-ggsave('Rides Per Member.png',
+ggsave('Bar Graph Rides Per Member.png',
        width=16,
        height=8)
 ```
 
+### Static line graph for start days
+
 ```{r}
 trip_data_clean_2021 %>% 
+  
   group_by(member_casual, rideable_type, start_day_string, start_day_int) %>% 
+  
   summarise(number_rides = length(ride_id)) %>%
   
   ggplot(aes(x = reorder(start_day_string, start_day_int), 
@@ -643,51 +377,18 @@ trip_data_clean_2021 %>%
        x = "Start Day", 
        y = "Number Of Rides")
 
-ggsave('Rides Per Start Day.png',
+ggsave('Line Graph Rides Per Start Day.png',
        width=16,
        height=8)
 ```
 
-```{r}
-plot_static = trip_data_clean_2021 %>% 
-  group_by(member_casual, rideable_type, start_day_string, start_day_int) %>% 
-  summarise(number_rides = length(ride_id)) %>%
-  
-  ggplot(aes(x = reorder(start_day_string, start_day_int), 
-             y = number_rides, group = rideable_type, 
-             text = paste0("Start Day: ", start_day_string, 
-                           "\nNumber Of Rides: ", number_rides, 
-                           "\nRide Type: ", rideable_type))) + 
-  
-  geom_line(aes(color = rideable_type, linetype = rideable_type)) +
-  
-  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
-  
-  facet_wrap(~ member_casual) + 
-  
-  theme_minimal() + 
-  
-  theme(plot.title = element_text(hjust = 0.5)) +
-  
-  scale_color_brewer(palette = "Dark2") +
-  
-  labs(title = "Number Of Rides Per Start Day", 
-       x = "Start Day", 
-       y = "Number Of Rides")
-```
-
-```{r}
-plot_interact = ggplotly(plot_static, tooltip = "text") %>% 
-  layout(legend = list(title = list(text="Ride Type")))
-```
-
-```{r}
-saveWidget(plot_interact, "Number Of Rides Per Start Day.html")
-```
+### Static line graph for end days
 
 ```{r}
 trip_data_clean_2021 %>% 
+  
   group_by(member_casual, rideable_type, end_day_string, end_day_int) %>% 
+  
   summarise(number_rides = length(ride_id)) %>%
   
   ggplot(aes(x = reorder(end_day_string, end_day_int), 
@@ -717,15 +418,15 @@ trip_data_clean_2021 %>%
   labs(title = "Number Of Rides Per End Day", 
        x = "End Day", 
        y = "Number Of Rides")
-
-ggsave('Rides Per End Day.png',
-       width=16,
-       height=8)
 ```
+
+### Static line graph for start month
 
 ```{r}
 trip_data_clean_2021 %>% 
+  
   group_by(member_casual, rideable_type, start_month_string, start_month_int) %>% 
+  
   summarise(number_rides = length(ride_id)) %>%
   
   ggplot(aes(x = reorder(start_month_string, start_month_int), 
@@ -756,51 +457,18 @@ trip_data_clean_2021 %>%
        x = "Start Month", 
        y = "Number Of Rides")
 
-ggsave('Rides Per Start Month.png',
+ggsave('Line Graph Rides Per Start Month.png',
        width=16,
        height=8)
 ```
 
-```{r}
-plot_static = trip_data_clean_2021 %>% 
-  group_by(member_casual, rideable_type, start_month_string, start_month_int) %>% 
-  summarise(number_rides = length(ride_id)) %>%
-  
-  ggplot(aes(x = reorder(start_month_string, start_month_int), 
-             y = number_rides, group = rideable_type, 
-             text = paste0("Start Month: ", start_month_string, 
-                           "\nNumber Of Rides: ", number_rides, 
-                           "\nRide Type: ", rideable_type))) + 
-  
-  geom_line(aes(color = rideable_type, linetype = rideable_type)) +
-  
-  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
-  
-  facet_wrap(~ member_casual) + 
-  
-  theme_minimal() + 
-  
-  theme(plot.title = element_text(hjust = 0.5)) +
-  
-  scale_color_brewer(palette = "Dark2") +
-  
-  labs(title = "Number Of Rides Per Start Month", 
-       x = "Start Month", 
-       y = "Number Of Rides")
-```
-
-```{r}
-plot_interact = ggplotly(plot_static, tooltip = "text") %>% 
-  layout(legend = list(title = list(text="Ride Type")))
-```
-
-```{r}
-saveWidget(plot_interact, "Number Of Rides Per Start Month.html")
-```
+### Static line graph for end month
 
 ```{r}
 trip_data_clean_2021 %>% 
+  
   group_by(member_casual, rideable_type, end_month_string, end_month_int) %>% 
+  
   summarise(number_rides = length(ride_id)) %>%
   
   ggplot(aes(x = reorder(end_month_string, end_month_int), 
@@ -830,15 +498,15 @@ trip_data_clean_2021 %>%
   labs(title = "Number Of Rides Per End Month", 
        x = "Start Month", 
        y = "Number Of Rides")
-
-ggsave('Rides Per End Month.png',
-       width=16,
-       height=8)
 ```
+
+### Static line graph for start hour
 
 ```{r}
 trip_data_clean_2021 %>% 
+  
   group_by(member_casual, rideable_type, start_hour = hour(start_time)) %>% 
+  
   summarise(number_rides = length(ride_id)) %>%
   
   ggplot(aes(x = reorder(start_hour, start_hour), 
@@ -869,23 +537,26 @@ trip_data_clean_2021 %>%
        x = "Start Hour", 
        y = "Number Of Rides")
 
-ggsave('Rides Per Start Hour.png',
+ggsave('Line Graph Rides Per Start Hour.png',
        width=16,
        height=8)
 ```
 
+### Static line graph for start hour during the weekend
+
 ```{r}
-plot_static = trip_data_clean_2021 %>% 
-  group_by(member_casual, rideable_type, start_hour = hour(start_time)) %>% 
+trip_data_clean_2021 %>% 
+  
+  group_by(member_casual, rideable_type, start_hour = hour(start_time)) %>%  
+  
+  filter(start_day_int == 7 || start_day_int == 1) %>%
+  
   summarise(number_rides = length(ride_id)) %>%
   
   ggplot(aes(x = reorder(start_hour, start_hour), 
-             y = number_rides, group = rideable_type, 
-             text = paste0("Start Hour: ", start_hour, 
-                           "\nNumber Of Rides: ", number_rides, 
-                           "\nRide Type: ", rideable_type))) + 
+             y = number_rides, group = rideable_type)) + 
   
-  geom_line(aes(color = rideable_type, linetype = rideable_type)) +
+  geom_line(aes(color = rideable_type, linetype = rideable_type)) + 
   
   geom_point(aes(color = rideable_type, shape = rideable_type)) + 
   
@@ -895,25 +566,81 @@ plot_static = trip_data_clean_2021 %>%
   
   theme(plot.title = element_text(hjust = 0.5)) +
   
-  scale_color_brewer(palette = "Dark2") +
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Ride Type", 
+                     labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
   
-  labs(title = "Number Of Rides Per Start Hour", 
+  scale_shape_discrete(name = "Ride Type", 
+                       labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_linetype_discrete(name = "Ride Type", 
+                          labels = c("Classic Bike", "Docked Bike", 
+                                     "Electric Bike")) + 
+  
+  labs(title = "Number Of Rides Per Start Hour During The Weekend", 
        x = "Start Hour", 
        y = "Number Of Rides")
+
+ggsave('Line Graph Rides Per Start Hour - Weekend.png',
+       width=16,
+       height=8)
 ```
 
-```{r}
-plot_interact = ggplotly(plot_static, tooltip = "text") %>% 
-  layout(legend = list(title = list(text="Ride Type")))
-```
-
-```{r}
-saveWidget(plot_interact, "Number Of Rides Per Start Hour.html")
-```
+### Static line graph for start hour during the week
 
 ```{r}
 trip_data_clean_2021 %>% 
+  
+  group_by(member_casual, rideable_type, start_hour = hour(start_time)) %>%  
+  
+  filter(start_day_int == 2 || 
+           start_day_int == 3 || 
+           start_day_int == 4 || 
+           start_day_int == 5 || 
+           start_day_int == 5) %>%
+  
+  summarise(number_rides = length(ride_id)) %>%
+  
+  ggplot(aes(x = reorder(start_hour, start_hour), 
+             y = number_rides, group = rideable_type)) + 
+  
+  geom_line(aes(color = rideable_type, linetype = rideable_type)) + 
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Ride Type", 
+                     labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_shape_discrete(name = "Ride Type", 
+                       labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_linetype_discrete(name = "Ride Type", 
+                          labels = c("Classic Bike", "Docked Bike", 
+                                     "Electric Bike")) + 
+  
+  labs(title = "Number Of Rides Per Start Hour During The Week", 
+       x = "Start Hour", 
+       y = "Number Of Rides")
+
+ggsave('Line Graph Rides Per Start Hour - Midweek.png',
+       width=16,
+       height=8)
+```
+
+### Static line graph for end hour
+
+```{r}
+trip_data_clean_2021 %>% 
+  
   group_by(member_casual, rideable_type, end_hour = hour(end_time)) %>% 
+  
   summarise(number_rides = length(ride_id)) %>%
   
   ggplot(aes(x = reorder(end_hour, end_hour), 
@@ -943,9 +670,476 @@ trip_data_clean_2021 %>%
   labs(title = "Number Of Rides Per End Hour", 
        x = "End Hour", 
        y = "Number Of Rides")
+```
 
-ggsave('Rides Per End Hour.png',
+### Static line graph for end hour during the weekend
+
+```{r}
+trip_data_clean_2021 %>% 
+  
+  group_by(member_casual, rideable_type, end_hour = hour(end_time)) %>% 
+  
+  filter(end_day_int == 7 || end_day_int == 1) %>%
+  
+  summarise(number_rides = length(ride_id)) %>%
+  
+  ggplot(aes(x = reorder(end_hour, end_hour), 
+             y = number_rides, group = rideable_type)) + 
+  
+  geom_line(aes(color = rideable_type, linetype = rideable_type)) + 
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Ride Type", 
+                     labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_shape_discrete(name = "Ride Type", 
+                       labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_linetype_discrete(name = "Ride Type", 
+                          labels = c("Classic Bike", "Docked Bike", 
+                                     "Electric Bike")) + 
+  
+  labs(title = "Number Of Rides Per End Hour DUring The Weekend", 
+       x = "End Hour", 
+       y = "Number Of Rides")
+```
+
+### Static line graph for end hour during the week
+
+```{r}
+trip_data_clean_2021 %>% 
+  
+  group_by(member_casual, rideable_type, end_hour = hour(end_time)) %>% 
+  
+  filter(end_day_int == 2 || 
+           end_day_int == 3 || 
+           end_day_int == 4 || 
+           end_day_int == 5 || 
+           end_day_int == 5) %>%
+  
+  summarise(number_rides = length(ride_id)) %>%
+  
+  ggplot(aes(x = reorder(end_hour, end_hour), 
+             y = number_rides, group = rideable_type)) + 
+  
+  geom_line(aes(color = rideable_type, linetype = rideable_type)) + 
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Ride Type", 
+                     labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_shape_discrete(name = "Ride Type", 
+                       labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_linetype_discrete(name = "Ride Type", 
+                          labels = c("Classic Bike", "Docked Bike", 
+                                     "Electric Bike")) + 
+  
+  labs(title = "Number Of Rides Per End Hour DUring The Week", 
+       x = "End Hour", 
+       y = "Number Of Rides")
+```
+
+### Interactive line graph for start days
+
+```{r}
+plot_static = trip_data_clean_2021 %>% 
+  
+  group_by(member_casual, rideable_type, start_day_string, start_day_int) %>% 
+  
+  summarise(number_rides = length(ride_id)) %>%
+  
+  ggplot(aes(x = reorder(start_day_string, start_day_int), 
+             y = number_rides, group = rideable_type, 
+             text = paste0("Start Day: ", start_day_string, 
+                           "\nNumber Of Rides: ", number_rides, 
+                           "\nRide Type: ", rideable_type))) + 
+  
+  geom_line(aes(color = rideable_type, linetype = rideable_type)) +
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2") +
+  
+  labs(title = "Number Of Rides Per Start Day", 
+       x = "Start Day", 
+       y = "Number Of Rides")
+```
+
+```{r}
+plot_interact = ggplotly(plot_static, tooltip = "text") %>% 
+  
+  layout(legend = list(title = list(text="Ride Type")))
+```
+
+```{r}
+saveWidget(plot_interact, "Number Of Rides Per Start Day.html")
+```
+
+### Interactive line graph for start month
+
+```{r}
+plot_static = trip_data_clean_2021 %>% 
+  
+  group_by(member_casual, rideable_type, start_month_string, start_month_int) %>% 
+  
+  summarise(number_rides = length(ride_id)) %>%
+  
+  ggplot(aes(x = reorder(start_month_string, start_month_int), 
+             y = number_rides, group = rideable_type, 
+             text = paste0("Start Month: ", start_month_string, 
+                           "\nNumber Of Rides: ", number_rides, 
+                           "\nRide Type: ", rideable_type))) + 
+  
+  geom_line(aes(color = rideable_type, linetype = rideable_type)) +
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2") +
+  
+  labs(title = "Number Of Rides Per Start Month", 
+       x = "Start Month", 
+       y = "Number Of Rides")
+```
+
+```{r}
+plot_interact = ggplotly(plot_static, tooltip = "text") %>% 
+  
+  layout(legend = list(title = list(text="Ride Type")))
+```
+
+```{r}
+saveWidget(plot_interact, "Number Of Rides Per Start Month.html")
+```
+
+### Interactive line graph for start hour
+
+```{r}
+plot_static = trip_data_clean_2021 %>% 
+  
+  group_by(member_casual, rideable_type, start_hour = hour(start_time)) %>% 
+  
+  summarise(number_rides = length(ride_id)) %>%
+  
+  ggplot(aes(x = reorder(start_hour, start_hour), 
+             y = number_rides, group = rideable_type, 
+             text = paste0("Start Hour: ", start_hour, 
+                           "\nNumber Of Rides: ", number_rides, 
+                           "\nRide Type: ", rideable_type))) + 
+  
+  geom_line(aes(color = rideable_type, linetype = rideable_type)) +
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2") +
+  
+  labs(title = "Number Of Rides Per Start Hour", 
+       x = "Start Hour", 
+       y = "Number Of Rides")
+```
+
+```{r}
+plot_interact = ggplotly(plot_static, tooltip = "text") %>% 
+  
+  layout(legend = list(title = list(text="Ride Type")))
+```
+
+```{r}
+saveWidget(plot_interact, "Number Of Rides Per Start Hour.html")
+```
+
+## Visualisations for trip length and displacement
+
+### Static scatterplot for start month
+
+```{r}
+trip_data_clean_2021 %>% 
+  
+  ggplot(aes(x = reorder(start_month_string, start_month_int), y = trip_length)) + 
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_text(angle = 90)) +
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Ride Type", 
+                     labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_shape_discrete(name = "Ride Type", 
+                       labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  labs(title = "Trip Length Against Start Month", 
+       x = "Start Month", 
+       y = "Trip Length")
+
+ggsave('Scatterplot Trip Length Per Start Month.png',
        width=16,
        height=8)
 ```
 
+```{r}
+trip_data_clean_2021 %>% 
+  
+  ggplot(aes(x = reorder(start_month_string, start_month_int), y = trip_displacement)) + 
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_text(angle = 90)) +
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Ride Type", 
+                     labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_shape_discrete(name = "Ride Type", 
+                       labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  labs(title = "Trip Displacement Against Start Month", 
+       x = "Start Month", 
+       y = "Trip Displacement")
+
+ggsave('Scatterplot Trip Displacement Per Start Month.png',
+       width=16,
+       height=8)
+```
+
+### Static scatterplot for start day
+
+```{r}
+trip_data_clean_2021 %>% 
+  
+  ggplot(aes(x = reorder(start_day_string, start_day_int), y = trip_length)) + 
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_text(angle = 90)) +
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Ride Type", 
+                     labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_shape_discrete(name = "Ride Type", 
+                       labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  labs(title = "Trip Length Against Start Day", 
+       x = "Start Day", 
+       y = "Trip Length")
+
+ggsave('Scatterplot Trip Length Per Start Day.png',
+       width=16,
+       height=8)
+```
+
+```{r}
+trip_data_clean_2021 %>% 
+  
+  ggplot(aes(x = reorder(start_day_string, start_day_int), y = trip_displacement)) + 
+  
+  geom_point(aes(color = rideable_type, shape = rideable_type)) + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_text(angle = 90)) +
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Ride Type", 
+                     labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  scale_shape_discrete(name = "Ride Type", 
+                       labels = c("Classic Bike", "Docked Bike", "Electric Bike")) + 
+  
+  labs(title = "Trip Displacement Against Start Day", 
+       x = "Start Day", 
+       y = "Trip Displacement")
+
+ggsave('Scatterplot Trip Displacement Per Start Day.png',
+       width=16,
+       height=8)
+```
+
+### Static boxplot for start month
+
+```{r}
+trip_data_clean_2021 %>% 
+  
+  ggplot(aes(x = reorder(start_month_string, start_month_int), y = trip_length)) + 
+  
+  geom_boxplot(aes(color = as.factor(start_month_string))) + 
+  
+  #geom_point(alpha = 0.25) + 
+  
+  stat_summary(fun = mean, geom = "point", shape = 2, size = 2, color = "blue") +
+  
+  stat_summary(fun = mean, geom = "smooth", group = 1, color = "blue") +
+  
+  scale_color_hue(name = "Start Month") + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_text(angle = 90)) +
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  labs(title = "Trip Length Against Start Month", 
+       x = "Start Month", 
+       y = "Trip Length")
+
+ggsave('Boxplot Trip Length Per Start Month.png',
+       width=16,
+       height=8)
+```
+
+```{r}
+trip_data_clean_2021 %>% 
+  
+  ggplot(aes(x = reorder(start_month_string, start_month_int), y = trip_displacement)) + 
+  
+  geom_boxplot(aes(color = as.factor(start_month_string))) + 
+  
+  #geom_point(alpha = 0.25) + 
+  
+  stat_summary(fun = mean, geom = "point", shape = 2, size = 2, color = "blue") +
+  
+  stat_summary(fun = mean, geom = "smooth", group = 1, color = "blue") +
+  
+  scale_color_hue(name = "Start Month") + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_text(angle = 90)) +
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  labs(title = "Trip Displacement Against Start Month", 
+       x = "Start Month", 
+       y = "Trip Length")
+
+ggsave('Boxplot Trip Displacement Per Start Month.png',
+       width=16,
+       height=8)
+```
+
+### Static boxplot for start day
+
+```{r}
+trip_data_clean_2021 %>% 
+  
+  ggplot(aes(x = reorder(start_day_string, start_day_int), y = trip_length)) + 
+  
+  geom_boxplot(aes(color = start_day_string)) + 
+  
+  #geom_point(alpha = 0.25) + 
+  
+  stat_summary(fun = mean, geom = "point", shape = 2, size = 2, color = "blue") +
+  
+  stat_summary(fun = mean, geom = "smooth", group = 1, color = "blue") +
+  
+  scale_color_hue(name = "Start Day") + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_text(angle = 90)) +
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  labs(title = "Trip Length Against Start Day", 
+       x = "Start Day", 
+       y = "Trip Length")
+
+ggsave('Boxplot Trip Length Per Start Day.png',
+       width=16,
+       height=8)
+```
+
+```{r}
+trip_data_clean_2021 %>% 
+  
+  ggplot(aes(x = reorder(start_day_string, start_day_int), y = trip_displacement)) + 
+  
+  geom_boxplot(aes(color = start_day_string)) + 
+  
+  #geom_point(alpha = 0.25) + 
+  
+  stat_summary(fun = mean, geom = "point", shape = 2, size = 2, color = "blue") +
+  
+  stat_summary(fun = mean, geom = "smooth", group = 1, color = "blue") +
+  
+  scale_color_hue(name = "Start Day") + 
+  
+  facet_wrap(~ member_casual) + 
+  
+  theme_minimal() + 
+  
+  theme(axis.text.x = element_text(angle = 90)) +
+  
+  theme(plot.title = element_text(hjust = 0.5)) +
+  
+  labs(title = "Trip Displacement Against Start Day", 
+       x = "Start Day", 
+       y = "Trip Displacement")
+
+ggsave('Boxplot Trip Displacement Per Start Day.png',
+       width=16,
+       height=8)
+```
